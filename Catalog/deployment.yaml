@@ -1,0 +1,108 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: catalog-ms-spring
+  labels:
+    app: "catalog-ms-spring"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "catalog-ms-spring"
+    spec:
+      initContainers:
+      - name: test-elasticsearch
+        image: alexeiled/curl:latest
+        imagePullPolicy: IfNotPresent
+        command:
+        - "/bin/sh"
+        - "-c"
+        - "set -x; until curl -k ${ES_PROTOCOL}://${ES_HOST}:${ES_PORT}/${ES_HEALTH} | grep -E 'green|yellow'; do echo waiting for elasticsearch; sleep 1; done; echo elasticsearch is ready"
+        resources:
+          limits:
+            memory: 384Mi
+          requests:
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: 2000
+        env:
+        - name: ES_URL
+          value: "${ES_PROTOCOL}://${ES_HOST}:${ES_PORT}"
+        - name: ES_HOST
+          value: "elasticsearch"
+        - name: ES_PROTOCOL
+          value: "http"
+        - name: ES_PORT
+          value: "9300"
+        - name: ES_HEALTH
+          value: "_cat/health"
+      - name: test-inventory
+        image: alexeiled/curl:latest
+        imagePullPolicy: IfNotPresent
+        command:
+        - "/bin/sh"
+        - "-c"
+        - "until curl ${INVENTORY_URL}; do echo waiting for inventory-ms-spring at ${INVENTORY_URL}; sleep 1; done; echo inventory is ready"
+        resources:
+          limits:
+            memory: 384Mi
+          requests:
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: 2000
+        env:
+        - name: INVENTORY_URL
+          value: http://inventory-ms-spring:8080/micro/inventory
+      containers:
+      - name: "catalog-ms-spring"
+        image: __IMAGE__
+        imagePullPolicy: "Always"
+        volumeMounts:
+        - mountPath: /spring-tmp
+          name: spring-tmp
+        ports:
+        - containerPort: 8081
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /micro/actuator/health
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /micro/actuator/liveness
+            port: 8090
+          initialDelaySeconds: 35
+          periodSeconds: 20
+          failureThreshold: 6
+        resources:
+          limits:
+            memory: 384Mi
+          requests:
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: 2000
+        env:
+        - name: JAVA_TMP_DIR
+          value: /spring-tmp
+        - name: ELASTIC_CLUSTER_NAME
+          value: "elasticsearch"
+        - name: ELASTIC_NODE_URL
+          value: "elasticsearch:9300"
+        - name: ELASTIC_REST_URI
+          value: "elasticsearch:9200"
+        - name: INVENTORY_URL
+          value: "http://inventory-ms-spring:8080/micro/inventory"
+      volumes:
+      - name: spring-tmp
+        emptyDir:
+          medium: "Memory"
