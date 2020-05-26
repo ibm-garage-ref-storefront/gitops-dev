@@ -1,0 +1,74 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: auth-ms-spring
+  labels:
+    app: "auth-ms-spring"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "auth-ms-spring"
+    spec:
+      initContainers:
+      - name: test-customer
+        image: ibmcase/bluecompute-bash-curl-ssl:latest
+        imagePullPolicy: IfNotPresent
+        command:
+        - "/bin/bash"
+        - "-c"
+        - "until curl --max-time 1 http://customer-ms-spring:8082; do echo waiting for customer-ms-spring; sleep 1; done"
+        resources:
+          limits:
+            memory: 384Mi
+          requests:
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: 2000
+      containers:
+      - name: "auth-ms-spring"
+        image:  __IMAGE__
+        imagePullPolicy: "Always"
+        volumeMounts:
+        - mountPath: /spring-tmp
+          name: spring-tmp
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8090
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /actuator/liveness
+            port: 8090
+          initialDelaySeconds: 35
+          periodSeconds: 20
+          failureThreshold: 6
+        resources:
+          limits:
+            memory: 384Mi
+          requests:
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: 2000
+        env:
+        - name: JAVA_TMP_DIR
+          value: /spring-tmp
+        - name: CUSTOMER_URL
+          value: "http://customer-ms-spring:8080/micro/customer/search"
+        - name: HS256_KEY
+          value: "E6526VJkKYhyTFRFMC0pTECpHcZ7TGcq8pKsVVgz9KtESVpheEO284qKzfzg8HpWNBPeHOxNGlyudUHi6i8tFQJXC8PiI48RUpMh23vPDLGD35pCM0417gf58z5xlmRNii56fwRCmIhhV7hDsm3KO2jRv4EBVz7HrYbzFeqI45CaStkMYNipzSm2duuer7zRdMjEKIdqsby0JfpQpykHmC5L6hxkX0BT7XWqztTr6xHCwqst26O0g8r7bXSYjp4a"
+      volumes:
+      - name: spring-tmp
+        emptyDir:
+          medium: "Memory"
