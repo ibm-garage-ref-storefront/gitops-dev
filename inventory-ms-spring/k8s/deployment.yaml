@@ -13,7 +13,7 @@ spec:
     spec:
       initContainers:
       - name: test-mysql
-        image: mysql:5.7.14
+        image: index.docker.io/ibmcase/inventory-ms-spring:91fc9ca7ade2106a92c0cd1d6c6f6003d1ec284e
         imagePullPolicy: IfNotPresent
         command:
         - "/bin/bash"
@@ -44,7 +44,7 @@ spec:
               key: mysql-password
       containers:
       - name: "inventory-ms-spring"
-        image: index.docker.io/ibmcase/inventory-ms-spring:acf2fcb32fcf7055eda74d87a9b004a4f7f21e0a
+        image: index.docker.io/ibmcase/inventory-ms-spring:91fc9ca7ade2106a92c0cd1d6c6f6003d1ec284e
         imagePullPolicy: "Always"
         volumeMounts:
         - mountPath: /spring-tmp
