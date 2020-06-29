@@ -13,7 +13,7 @@ spec:
     spec:
       initContainers:
       - name: test-mysql
-        image: index.docker.io/ibmcase/inventory-ms-spring:91fc9ca7ade2106a92c0cd1d6c6f6003d1ec284e
+        image: mysql:5.7.14
         imagePullPolicy: IfNotPresent
         command:
         - "/bin/bash"
