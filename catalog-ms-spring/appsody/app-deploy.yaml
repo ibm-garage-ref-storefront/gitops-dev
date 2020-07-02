@@ -61,7 +61,7 @@ metadata:
   name: catalog-ms-spring
   namespace: storefront-dev
 spec:
-  applicationImage: index.docker.io/ibmcase/catalog-ms-spring:010bded836ab98b3a0ae9857b06591580aa5036a
+  applicationImage: index.docker.io/ibmcase/catalog-ms-spring:2889c3da4e733337eea843d7a3220c0503e09d0a
   createKnativeService: false
   expose: true
   livenessProbe:
