@@ -61,7 +61,7 @@ metadata:
   name: auth-ms-spring
   namespace: storefront-dev
 spec:
-  applicationImage: docker.io/ibmcase/auth-ms-spring
+  applicationImage: index.docker.io/ibmcase/auth-ms-spring:f0c8423219bcb8699e9db42bee8e9f7d902de228
   createKnativeService: false
   expose: true
   livenessProbe:
