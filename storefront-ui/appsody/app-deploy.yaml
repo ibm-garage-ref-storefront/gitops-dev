@@ -67,7 +67,7 @@ metadata:
   name: web
   namespace: storefront-dev
 spec:
-  applicationImage: index.docker.io/ibmcase/storefront-ui:b897d54f0b7beca7cf4e7ade4d9732176208d7af
+  applicationImage: index.docker.io/ibmcase/storefront-ui:4ece9a853d259d2125bd754a6d08db9d8d9b72ca
   createKnativeService: false
   expose: true
   service:
