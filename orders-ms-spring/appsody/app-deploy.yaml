@@ -61,7 +61,7 @@ metadata:
   name: orders-ms-spring
   namespace: storefront-dev
 spec:
-  applicationImage: index.docker.io/ibmcase/orders-ms-spring:24d2ad420c56ac1e8a544f444bd0a888fbb42d0e
+  applicationImage: index.docker.io/ibmcase/orders-ms-spring:e83adecdd02ba82f6be7ea53f984cfb9b067618e
   createKnativeService: false
   expose: true
   livenessProbe:
