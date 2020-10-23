@@ -62,7 +62,7 @@ metadata:
   name: inventory-ms-spring
   namespace: storefront-dev
 spec:
-  applicationImage: index.docker.io/ibmcase/inventory-ms-spring:a95830adcce7ddad5a4150a8d4fb6dacafb7420e
+  applicationImage: index.docker.io/ibmcase/inventory-ms-spring:51ae7be04a0a7677c481724985b7bcf925ca6459
   createKnativeService: false
   expose: true
   livenessProbe:
